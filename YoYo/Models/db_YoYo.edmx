@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="db_YoyoModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="db_YoyoModelStoreContainer">
+          <EntitySet Name="aspnet_Users" EntityType="db_YoyoModel.Store.aspnet_Users" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Comments" EntityType="db_YoyoModel.Store.Comments" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Pictures" EntityType="db_YoyoModel.Store.Pictures" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Ratings" EntityType="db_YoyoModel.Store.Ratings" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Videos" EntityType="db_YoyoModel.Store.Videos" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_Comments_aspnet_Users" Association="db_YoyoModel.Store.FK_Comments_aspnet_Users">
+            <End Role="aspnet_Users" EntitySet="aspnet_Users" />
+            <End Role="Comments" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comments_Videos" Association="db_YoyoModel.Store.FK_Comments_Videos">
+            <End Role="Videos" EntitySet="Videos" />
+            <End Role="Comments" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Pictures_aspnet_Users" Association="db_YoyoModel.Store.FK_Pictures_aspnet_Users">
+            <End Role="aspnet_Users" EntitySet="aspnet_Users" />
+            <End Role="Pictures" EntitySet="Pictures" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ratings_Videos" Association="db_YoyoModel.Store.FK_Ratings_Videos">
+            <End Role="Videos" EntitySet="Videos" />
+            <End Role="Ratings" EntitySet="Ratings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Videos_aspnet_Users" Association="db_YoyoModel.Store.FK_Videos_aspnet_Users">
+            <End Role="aspnet_Users" EntitySet="aspnet_Users" />
+            <End Role="Videos" EntitySet="Videos" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="aspnet_Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="ApplicationId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" Nullable="false" MaxLength="256" />
+          <Property Name="LoweredUserName" Type="nvarchar" Nullable="false" MaxLength="256" />
+          <Property Name="MobileAlias" Type="nvarchar" MaxLength="16" />
+          <Property Name="IsAnonymous" Type="bit" Nullable="false" />
+          <Property Name="LastActivityDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Comments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Text" Type="varchar" Nullable="false" MaxLength="250" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="VideoId" Type="int" />
+        </EntityType>
+        <EntityType Name="Pictures">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Link" Type="varchar" Nullable="false" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="Ratings">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="VideoId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Date" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Videos">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="varchar" Nullable="false" MaxLength="250" />
+          <Property Name="Description" Type="varchar(max)" />
+          <Property Name="UserId" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="Link" Type="varchar" Nullable="false" MaxLength="500" />
+        </EntityType>
+        <Association Name="FK_Comments_aspnet_Users">
+          <End Role="aspnet_Users" Type="db_YoyoModel.Store.aspnet_Users" Multiplicity="1" />
+          <End Role="Comments" Type="db_YoyoModel.Store.Comments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aspnet_Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Comments">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comments_Videos">
+          <End Role="Videos" Type="db_YoyoModel.Store.Videos" Multiplicity="0..1" />
+          <End Role="Comments" Type="db_YoyoModel.Store.Comments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Videos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Comments">
+              <PropertyRef Name="VideoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Pictures_aspnet_Users">
+          <End Role="aspnet_Users" Type="db_YoyoModel.Store.aspnet_Users" Multiplicity="1" />
+          <End Role="Pictures" Type="db_YoyoModel.Store.Pictures" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="aspnet_Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Pictures">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ratings_Videos">
+          <End Role="Videos" Type="db_YoyoModel.Store.Videos" Multiplicity="1" />
+          <End Role="Ratings" Type="db_YoyoModel.Store.Ratings" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Videos">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Ratings">
+              <PropertyRef Name="VideoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Videos_aspnet_Users">
+          <End Role="aspnet_Users" Type="db_YoyoModel.Store.aspnet_Users" Multiplicity="1" />
+          <End Role="Videos" Type="db_YoyoModel.Store.Videos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aspnet_Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Videos">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="db_YoyoModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="YoyoEntities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="Users" EntityType="db_YoyoModel.User" />
+          <EntitySet Name="Pictures" EntityType="db_YoyoModel.Picture" />
+          <EntitySet Name="Videos" EntityType="db_YoyoModel.Video" />
+          <AssociationSet Name="FK_Pictures_aspnet_Users" Association="db_YoyoModel.FK_Pictures_aspnet_Users">
+            <End Role="aspnet_Users" EntitySet="Users" />
+            <End Role="Pictures" EntitySet="Pictures" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Videos_aspnet_Users" Association="db_YoyoModel.FK_Videos_aspnet_Users">
+            <End Role="aspnet_Users" EntitySet="Users" />
+            <End Role="Videos" EntitySet="Videos" />
+          </AssociationSet>
+          <EntitySet Name="Ratings" EntityType="db_YoyoModel.Rating" />
+          <AssociationSet Name="FK_Ratings_Videos" Association="db_YoyoModel.FK_Ratings_Videos">
+            <End Role="Video" EntitySet="Videos" />
+            <End Role="Rating" EntitySet="Ratings" />
+          </AssociationSet>
+          <EntitySet Name="Comments" EntityType="db_YoyoModel.Comment" />
+          <AssociationSet Name="FK_Comments_aspnet_Users" Association="db_YoyoModel.FK_Comments_aspnet_Users">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Comments_Videos" Association="db_YoyoModel.FK_Comments_Videos">
+            <End Role="Video" EntitySet="Videos" />
+            <End Role="Comment" EntitySet="Comments" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="ApplicationId" Type="Guid" Nullable="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
+          <Property Name="LoweredUserName" Type="String" Nullable="false" MaxLength="256" Unicode="true" FixedLength="false" />
+          <Property Name="MobileAlias" Type="String" MaxLength="16" Unicode="true" FixedLength="false" />
+          <Property Name="IsAnonymous" Type="Boolean" Nullable="false" />
+          <Property Name="LastActivityDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Picture" Relationship="db_YoyoModel.FK_Pictures_aspnet_Users" FromRole="aspnet_Users" ToRole="Pictures" />
+          <NavigationProperty Name="Videos" Relationship="db_YoyoModel.FK_Videos_aspnet_Users" FromRole="aspnet_Users" ToRole="Videos" />
+          <NavigationProperty Name="Comments" Relationship="db_YoyoModel.FK_Comments_aspnet_Users" FromRole="User" ToRole="Comment" />
+        </EntityType>
+        <EntityType Name="Picture">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="Link" Type="String" Nullable="false" MaxLength="500" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="User" Relationship="db_YoyoModel.FK_Pictures_aspnet_Users" FromRole="Pictures" ToRole="aspnet_Users" />
+        </EntityType>
+        <EntityType Name="Video">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" Unicode="false" FixedLength="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" Unicode="false" FixedLength="false" />
+          <Property Name="UserId" Type="Guid" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Link" Type="String" Nullable="false" MaxLength="500" Unicode="false" FixedLength="false" />
+          <NavigationProperty Name="User" Relationship="db_YoyoModel.FK_Videos_aspnet_Users" FromRole="Videos" ToRole="aspnet_Users" />
+          <NavigationProperty Name="Ratings" Relationship="db_YoyoModel.FK_Ratings_Videos" FromRole="Video" ToRole="Rating" />
+          <NavigationProperty Name="Comments" Relationship="db_YoyoModel.FK_Comments_Videos" FromRole="Video" ToRole="Comment" />
+        </EntityType>
+        <Association Name="FK_Pictures_aspnet_Users">
+          <End Role="aspnet_Users" Type="db_YoyoModel.User" Multiplicity="1" />
+          <End Role="Pictures" Type="db_YoyoModel.Picture" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="aspnet_Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Pictures">
+              <PropertyRef Name="Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Videos_aspnet_Users">
+          <End Role="aspnet_Users" Type="db_YoyoModel.User" Multiplicity="1" />
+          <End Role="Videos" Type="db_YoyoModel.Video" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="aspnet_Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Videos">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Rating">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="VideoId" Nullable="false" />
+          <Property Type="Guid" Name="UserId" Nullable="false" />
+          <Property Type="DateTime" Name="Date" Precision="3" />
+          <NavigationProperty Name="Video" Relationship="db_YoyoModel.FK_Ratings_Videos" FromRole="Rating" ToRole="Video" />
+        </EntityType>
+        <Association Name="FK_Ratings_Videos">
+          <End Type="db_YoyoModel.Video" Role="Video" Multiplicity="1" />
+          <End Type="db_YoyoModel.Rating" Role="Rating" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Video">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Rating">
+              <PropertyRef Name="VideoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Text" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Type="Guid" Name="UserId" Nullable="false" />
+          <Property Type="DateTime" Name="Date" Nullable="false" Precision="3" />
+          <Property Type="Int32" Name="VideoId" />
+          <NavigationProperty Name="aspnet_Users" Relationship="db_YoyoModel.FK_Comments_aspnet_Users" FromRole="Comment" ToRole="User" />
+          <NavigationProperty Name="Video" Relationship="db_YoyoModel.FK_Comments_Videos" FromRole="Comment" ToRole="Video" />
+        </EntityType>
+        <Association Name="FK_Comments_aspnet_Users">
+          <End Type="db_YoyoModel.User" Role="User" Multiplicity="1" />
+          <End Type="db_YoyoModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Comments_Videos">
+          <End Type="db_YoyoModel.Video" Role="Video" Multiplicity="0..1" />
+          <End Type="db_YoyoModel.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Video">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="VideoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="db_YoyoModelStoreContainer" CdmEntityContainer="YoyoEntities">
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="db_YoyoModel.User">
+              <MappingFragment StoreEntitySet="aspnet_Users">
+                <ScalarProperty Name="ApplicationId" ColumnName="ApplicationId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="LoweredUserName" ColumnName="LoweredUserName" />
+                <ScalarProperty Name="MobileAlias" ColumnName="MobileAlias" />
+                <ScalarProperty Name="IsAnonymous" ColumnName="IsAnonymous" />
+                <ScalarProperty Name="LastActivityDate" ColumnName="LastActivityDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Pictures">
+            <EntityTypeMapping TypeName="db_YoyoModel.Picture">
+              <MappingFragment StoreEntitySet="Pictures">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Link" ColumnName="Link" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Videos">
+            <EntityTypeMapping TypeName="db_YoyoModel.Video">
+              <MappingFragment StoreEntitySet="Videos">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Link" ColumnName="Link" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ratings">
+            <EntityTypeMapping TypeName="db_YoyoModel.Rating">
+              <MappingFragment StoreEntitySet="Ratings">
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="VideoId" ColumnName="VideoId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comments">
+            <EntityTypeMapping TypeName="db_YoyoModel.Comment">
+              <MappingFragment StoreEntitySet="Comments">
+                <ScalarProperty Name="VideoId" ColumnName="VideoId" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

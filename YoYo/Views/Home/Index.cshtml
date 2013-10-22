@@ -1,0 +1,507 @@
+﻿@{
+    Layout = null;
+}
+@model IList<YoYo.Models.Video>
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>YoYo Eğlence zamanı!</title>
+    <script src="~/js/jquery.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/bootstrap-responsive.min.css" rel="stylesheet" />
+
+    <style>
+        .divVideo {
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 800;
+            border-style: solid;
+            border-width: 1px;
+            border-color: #979090;
+            border-radius: 2px;
+            padding: 5px;
+            background: #ffffff; /* Old browsers */
+            background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* IE10+ */
+            background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+        }
+
+            .divVideo p {
+                font-size: 12px;
+                font-weight: 400;
+            }
+
+        .videoCloseButton {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+            .videoCloseButton:hover {
+                background-color: #e63838;
+            }
+
+        .divHeader {
+            background: #ffffff; /* Old browsers */
+            background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top, #ffffff 0%,#e5e5e5 100%); /* IE10+ */
+            background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+            height: 80px;
+            position: fixed;
+        }
+
+        .divContent {
+            width: 100%;
+            margin: auto;
+            margin-top: 100px;
+        }
+
+        .divVideos {
+            margin: auto;
+        }
+
+        .divVideo {
+            width: 180px;
+            float: left;
+            margin-left: 20px;
+        }
+
+        #divVideoPlayer {
+            position: fixed;
+            margin-top: 80px;
+        }
+
+            #divVideoPlayer video {
+                border-style: solid;
+                border-width: 5px;
+                border-color: #979090;
+                border-radius: 5px;
+            }
+        .divComment {
+            margin-top:10px;
+        }
+        .divComments {
+            max-height:300px;
+            overflow-y:scroll;
+            overflow-x:hidden;
+            
+        }
+        .writeComment {
+            margin-top:10px;
+        }
+    </style>
+    <script>
+        var videoPlayer;
+        var videoId;
+        var videoInterval;
+        var photoIndex = 1;
+        var photoUrl;
+        var photoVideoId;
+        function Login() {
+
+            var username = $("#txtLoginUserName").val();
+            var password = $("#txtLoginPassword").val();
+
+            $.ajax({
+
+                url: '@Url.Action("Login", "Home")',
+                method: 'POST',
+                data: { un: username, pw: password },
+                success: function (data) {
+
+                    if (data.result) {
+
+                        $("#modalLogin").modal('hide');
+                        $("#txtLoginUserName").val("");
+                        $("#txtLoginPassword").val("");
+                        $("#pLoginErr").hide();
+
+
+                        $("#pUsername").text(data.username);
+                        $("#pVideoCount").text(data.videoCount);
+                        $("#imgProfile").attr("src", "ProfilePictures/" + data.pictureLink);
+
+                        $("#btnLogin").fadeOut();
+                        $("#btnSignUp").fadeOut();
+
+                        $("#btnUploadVideo").fadeIn();
+                        $("#divProfile").fadeIn();
+
+                        $(".writeComment").show();
+
+
+                    }
+                    else {
+                        $("#pLoginErr").show();
+                    }
+                }
+
+            });
+
+        }
+
+        function LogOut() {
+            $.ajax({
+
+                url: '@Url.Action("LogOut", "Home")',
+                method: 'post',
+                success: function (data) {
+                    $("#btnUploadVideo").hide();
+                    $("#divProfile").hide();
+
+                    $("#btnLogin").fadeIn();
+                    $("#btnSignUp").fadeIn();
+
+                    $(".writeComment").hide();
+
+
+
+                }
+            });
+        }
+
+        function PlayVideo(id) {
+
+            $.ajax({
+
+                url: '@Url.Action("GetVideo", "Home")',
+                method: 'post',
+                data: { id: id },
+                success: function (data) {
+
+                    videoId = id;
+
+                    $("#videoPlayer").attr("src", "/Videos/" + data.url + ".mp4");
+
+                    $("#hVideoHeader").text(data.header);
+                    $("#pVideoDescription").text(data.description);
+                    $("#imgVideo").attr("src", "/VideosPictures/" + data.url + "_1.png");
+                    $("#pVideoRating").text(data.rating);
+
+                    if ($("#divVideoPlayer").css("display") != "block") {
+
+                        $("#divVideoPlayer").fadeIn();
+
+                    }
+
+                    $.ajax({
+
+                        url: '/Home/GetComments',
+                        method: 'post',
+                        data: { videoId: videoId },
+                        success: function (data)
+                        {
+
+                            $(".divComments").html("");
+                            $(".divComments").append('<div class="span"></div>');
+
+                            for (var i = 0; i < data.length; i++) {
+
+                                SetComment(data[i].Photo, data[i].Username, data[i].DateStr, data[i].Text);
+
+                            }
+
+                        }
+                    });
+
+
+                    //$("html,body").animate({
+                    //    scrollTop: '0px'
+                    //}, 500, function () {
+                    //    videoPlayer.play();
+                    //});
+
+                    videoPlayer.play();
+
+
+                }
+            });
+
+        }
+
+        function SetComment(photo,username,date,text)
+        {
+            if (photo == null)
+                photo = "profile.jpg";
+
+            $(".divComments").append('<div class="span12 divComment"><div class="span3"><img src="/ProfilePictures/' + photo + '" /></div><div class="span9"><div class="row-fluid"><div class="span4"><strong>' + username + '</strong></div><div class="span7 text-right">' + date + '</div></div><div class="row-fluid"> ' + text + ' </div> </div></div>');
+        }
+
+        function CloseVideoDiv() {
+            videoPlayer.pause();
+
+            $("#divVideoPlayer").fadeOut();
+        }
+
+        function init() {
+            videoPlayer = document.getElementById("videoPlayer");
+
+            videoPlayer.addEventListener("play", function () {
+                //alert(videoPlayer.currentTime);
+
+                if (videoPlayer.currentTime == 0) {
+
+
+                    $.ajax(
+                        {
+                            url: '@Url.Action("VideoPlayed", "Home")',
+                            method: 'post',
+                            data: { id: videoId },
+                            success: function () { }
+                        });
+
+                }
+            });
+
+            $(".divVideo").mouseenter(function () {
+
+                photoUrl = $(this).attr("data-url");
+                photoVideoId = $(this).attr("data-id");
+
+                videoInterval = setInterval(function () {
+                    $("#videoPic_" + photoVideoId).attr("src", "/VideosPictures/" + photoUrl + "_" + photoIndex + ".png");
+                    photoIndex++;
+                    if (photoIndex == 6)
+                        photoIndex = 1;
+
+                }, 500);
+
+            });
+            $(".divVideo").mouseleave(function () {
+
+                clearInterval(videoInterval);
+                $("#videoPic_" + photoVideoId).attr("src", "/VideosPictures/" + photoUrl + "_1" + ".png");
+                photoIndex = 1;
+
+            });
+        }
+
+        function SendComment()
+        {
+            
+            var comm = $("#txtComment").val();
+
+            $.ajax({
+                    
+                url: '@Url.Action("SendComment","Home")',
+                method: 'post',
+                data: { com: comm,videoId:videoId },
+                success: function (data)
+                {
+                    $.ajax({
+                        url: '/Home/GetComment',
+                        method: 'post',
+                        data: { id: data.commentId },
+                        success: function (e)
+                        {
+                            SetComment(e.comment.Photo, e.comment.Username, e.comment.DateStr, e.comment.Text);
+                            $(".divComments").animate(
+                                { scrollTop: $(".divComments").height()+"px" },300
+                                );
+                            $("#txtComment").val("");
+                        }
+                    });
+                }
+            });
+
+        }
+    </script>
+</head>
+<body onload="init()" style="background-color: #f8f8f8">
+    <div class="row-fluid divHeader">
+        <div class="span2" style="text-align: center; padding: 25px">
+            <p style="font-size: 60px; color: #e63838; font-family: 'Informal Roman'">YoYo</p>
+            <p>Video İzle, Yükle</p>
+        </div>
+        <div class="span4 offset2" style="padding: 20px">
+            @{
+                string login = "hide";
+                string unlogin = "";
+
+                if (User.Identity.IsAuthenticated)
+                {
+                    login = "";
+                    unlogin = "hide";
+                }
+            }
+            <input id="btnUploadVideo" type="button" onclick="$('#modalVideoUpload').modal('show')" class="btn span12 btn-warning @login" style="height: 40px; font-family: 'Informal Roman'; font-size: 35px" value="Video Yükle" />
+
+            <input id="btnLogin" onclick="$('#modalLogin').modal('show')" type="button" class="btn span6 btn-success @unlogin" style="height: 40px; font-family: 'Informal Roman'; font-size: 35px" value="Giriş" />
+            <input id="btnSignUp" onclick="$('#modalSignUp').modal('show')" type="button" class="btn span6 btn-success @unlogin" style="height: 40px; font-family: 'Informal Roman'; font-size: 35px" value="Kayıt Ol" />
+        </div>
+
+        @{
+            YoYo.Models.User user = new YoYo.Models.User();
+            user.Picture = new YoYo.Models.Picture();
+
+            if (User.Identity.IsAuthenticated)
+            {
+                user = YoYo.Models.Helper.GetUser();
+
+                if (user.Picture == null)
+                {
+                    YoYo.Models.Picture p = new YoYo.Models.Picture();
+                    p.Link = "profile.jpg";
+                    user.Picture = p;
+                }
+            }
+        }
+
+        <div id="divProfile" class="span3 offset1 @login" style="padding:10px 10px 0px 10px;">
+            <div class="span4">
+                <img style="height:60px" id="imgProfile" src="/ProfilePictures/@user.Picture.Link" />
+            </div>
+            <div class="span8">
+                <input type="button" class="btn btn-danger pull-right" value="Çıkış" onclick="LogOut()" />
+                <h4 id="pUsername">@user.UserName</h4>
+                <p>Toplam <span id="pVideoCount">@user.Videos.Count</span> video</p>
+            </div>
+        </div>
+    </div>
+    <div id="divVideoPlayer" class="row-fluid hide" style="background-color: #ebd8d8; min-height: 500px;">
+        <div class="span"></div>
+        <div class="span7">
+            <video class="span12" id="videoPlayer" controls="controls">
+                <source src="~/Videos/5217C457.MP4" />
+            </video>
+        </div>
+        <div class="span4">
+            <div class="row-fluid">
+                <i class="icon-remove pull-right videoCloseButton" onclick="CloseVideoDiv()"></i>
+                <div class="row-fluid"></div>
+                <div class="row-fluid">
+                    <img id="imgVideo" src="" class="span3 pull-left" />
+                    <h4 class="span9" id="hVideoHeader"></h4>
+                    <p class="span9">Bu videoyu <span id="pVideoRating"></span>kişi izledi</p>
+                </div>
+                <p id="pVideoDescription">
+                </p>
+            </div>
+            <div class="row-fluid">
+                <h3>Yorumlar</h3>
+                <div class="divComments">
+                    
+                </div>
+                
+                <div class="writeComment @login">
+                    <div class="row-fluid">
+                            <textarea class="span8" id="txtComment"></textarea>
+                            <input type="button" onclick="SendComment()" class="btn span4" value="Gönder" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="divContent">
+            <div class="row-fluid divVideos">
+                <div class="span"></div>
+
+                @foreach (var v in Model)
+                {
+                    <div class="divVideo" onclick="PlayVideo(@v.Id)" id="video_@v.Id" data-id="@v.Id" data-url="@v.Link">
+                        <img id="videoPic_@v.Id" src="~/VideosPictures/@(v.Link)_1.png" />
+                        <h5>@(v.Name.Length > 50 ? v.Name.Substring(0, 50) + "..." : v.Name)</h5>
+                        <div class="row-fluid">
+                            <div class="span6">
+                                <p><strong>@v.User.UserName</strong></p>
+                            </div>
+                            <div class="span6">
+                                <p><strong>@v.Ratings.Count</strong> kişi</p>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSignUp" class="modal fade hide">
+
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2>Kayıt Ol</h2>
+        </div>
+        <form action="@Url.Action("SignUp", "Home")" method="post" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="row-fluid">
+                    <div class="span10 offset1">
+                        <input type="text" class="span12" name="username" placeholder="Kullanıcı Adı" />
+                        <input type="password" class="span12" name="password" placeholder="Şifre" />
+                        <input type="text" class="span12" name="mail" placeholder="Mail" />
+                        <input type="file" class="span12" name="picture" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row-fluid">
+                    <input type="submit" class="btn span6 offset3" value="Kaydet" />
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="modalLogin" class="modal fade hide">
+
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2>Giriş Yap</h2>
+        </div>
+        <div class="modal-body">
+
+            <div class="row-fluid">
+                <div class="span10 offset1">
+                    <input type="text" class="span12" id="txtLoginUserName" placeholder="Kullanıcı Adı" />
+                    <input type="password" class="span12" id="txtLoginPassword" placeholder="Şifre" />
+                    <p style="color: red; display: none" id="pLoginErr">Kullanıcı Adı veya Şifre hatalı</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="row-fluid">
+                <input type="button" onclick="Login()" class="btn span6 offset3" value="Giriş" />
+            </div>
+        </div>
+
+    </div>
+
+    <div id="modalVideoUpload" class="modal fade hide">
+
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h2>Video Yükle</h2>
+        </div>
+        <form action="@Url.Action("Upload", "Home")" method="post" enctype="multipart/form-data" onsubmit="$('#smtVideoUpload').addClass('disabled')">
+            <div class="modal-body">
+
+                <div class="row-fluid">
+                    <div class="span10 offset1">
+                        <input type="text" class="span12" name="name" placeholder="Başlık" />
+                        <textarea class="span12 textarea-editor" name="description" id="videoDescription"></textarea>
+                        <input type="file" name="video" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row-fluid">
+                    <input id="smtVideoUpload" type="submit" class="btn span6 offset3" value="Yükle" />
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
